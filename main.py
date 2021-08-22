@@ -78,6 +78,20 @@ flag_err = dict(error='no error')
 async def get_goods_array(good: str):
     good_ = await good_get_array(client, good)
     return good_
+
+@app.get("/info")
+async def get_goods_array(Session: Optional[str] = Header(None))):
+   
+    user = await check_auf(client, Session)
+    if user is None:
+        return {'error': 'Access denied'}
+      
+    comp = await seller_id_get(client, user["comp_id"])
+   
+    del comp["password"]
+      
+    return comp
+
 @app.get("/get_good")
 async def get_good(good: str):
     good_ = await good_get(client, good)
