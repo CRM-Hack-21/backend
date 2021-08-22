@@ -1,15 +1,12 @@
 import uuid
 from hashlib import sha256
 import os
+from bson.objectid import ObjectId
+from mongo_db_init import CONNECTION_STRING
+from pymongo import MongoClient
+import pymongo
+    
 def get_database():
-    from pymongo import MongoClient
-    import pymongo
-    # Provide the mongodb atlas url to connect python to mongodb using pymongo
-    CONNECTION_STRING = os.getenv('CONNECTION_STRING')
-
-
-    # Create a connection using MongoClient. You can import MongoClient or use pymongo.MongoClient
-    from pymongo import MongoClient
     client = MongoClient(CONNECTION_STRING)
     return client
 
@@ -17,6 +14,7 @@ def get_database():
 async def init_db(client, dick,model_auth,flag_err):
     companies_collection = client.my_db.get_collection('companies')
     dick['password'] = sha256(dick['password'].encode('utf-8')).hexdigest()
+    dick['_id'] = str(uuid.uuid4())
     result = companies_collection.insert_one(dick)
     rslt = await init_auth(client, dick, model_auth)
 
@@ -75,6 +73,7 @@ async def add_vk(client, header, token):
 
     return { "msg": "ok" }
 async def add_good(client, market_lot):
+    #market_lot["_id"] = uuid.uuid4()
     goods_collection = client.my_db.get_collection('goods')
    # tmp = auth_collection.find_one({'_id': comp_dic['comp_id']})
     res=goods_collection.insert_one(market_lot)
@@ -102,7 +101,7 @@ async def good_get_array(client,id ):
     auth_collection = client.my_db.get_collection('goods')
     #or elements in auth_collection.find_one
     result = list()
-    for item in auth_collection.find({'sellers_id': id}):
+    for item in auth_collection.find({"sellers_id": str(id)}):
         result.append(item)
    # print(result['main_photo_id'])
     return result
