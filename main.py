@@ -80,7 +80,7 @@ async def get_goods_array(good: str):
     return good_
 
 @app.get("/info")
-async def get_goods_array(Session: Optional[str] = Header(None))):
+async def get_goods_array(Session: Optional[str] = Header(None)):
    
     user = await check_auf(client, Session)
     if user is None:
